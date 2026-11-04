@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>26中超赛季绑定球员包 · 球员一览</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+         background: #f5f7fa; color: #1f2933; }
+  header { position: sticky; top: 0; z-index: 20; background: linear-gradient(100deg,#0f2c52,#1f6feb);
+           color: #fff; padding: 14px 22px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header .sub { font-size: 12px; opacity: .85; margin-top: 3px; }
+  input[type=text] { margin-left: auto; border: none; border-radius: 8px; padding: 8px 12px;
+                     width: 220px; font-size: 13px; outline: none; }
+  .layout { display: flex; height: calc(100vh - 62px); }
+  aside { width: 230px; overflow-y: auto; background: #fff; border-right: 1px solid #e3e8ef; padding: 10px 0; }
+  .grp-title { font-size: 12px; color: #7b8794; padding: 12px 16px 6px; font-weight: 600; }
+  .item { padding: 9px 16px; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between;
+          align-items: center; border-left: 3px solid transparent; }
+  .item:hover { background: #f0f4f9; }
+  .item.active { background: #e8f0fe; border-left-color: #1f6feb; color: #0f2c52; font-weight: 600; }
+  .item .tag { font-size: 11px; padding: 1px 6px; border-radius: 6px; background: #eef2f7; color: #52606d; }
+  .item.active .tag { background: #1f6feb; color: #fff; }
+  main { flex: 1; overflow-y: auto; padding: 20px 24px 40px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(16,24,40,.08);
+          padding: 18px 20px; margin-bottom: 16px; }
+  .pack-title { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+  .pack-desc { font-size: 12px; color: #7b8794; margin-bottom: 12px; }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; }
+  .meta div { background: #f5f7fa; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #52606d; }
+  .meta b { display: block; font-size: 15px; color: #0f2c52; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { position: sticky; top: 0; background: #f0f4f9; color: #3e4c59; font-weight: 600; text-align: left;
+       padding: 10px; border-bottom: 1px solid #dfe4ea; white-space: nowrap; }
+  td { padding: 8px 10px; border-bottom: 1px solid #eef1f5; }
+  tbody tr:hover { background: #f8fafc; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .ovr { display: inline-block; min-width: 36px; text-align: center; border-radius: 5px; padding: 2px 6px;
+         font-weight: 700; color: #fff; font-size: 12px; }
+  .rank { color: #7b8794; font-weight: 600; }
+  footer { padding: 12px 4px; font-size: 12px; color: #7b8794; }
+  @media (max-width: 820px) {
+    header { padding: 10px 14px; gap: 8px; }
+    header h1 { font-size: 15px; }
+    header .sub { font-size: 11px; }
+    input[type=text] { margin-left: 0; width: 100%; flex: 1 1 100%; }
+    .layout { flex-direction: column; height: auto; }
+    aside { width: 100%; height: auto; display: flex; gap: 8px; padding: 10px 12px;
+            overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid #e3e8ef;
+            -webkit-overflow-scrolling: touch; }
+    .grp-title { display: none; }
+    .item { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-left: none;
+            border: 1px solid #e3e8ef; border-radius: 999px; }
+    .item.active { border-color: #1f6feb; }
+    .item .tag { display: none; }
+    main { overflow: visible; padding: 14px 12px 32px; }
+    .card { padding: 14px 14px; }
+    table { font-size: 12px; }
+    th, td { padding: 7px 6px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>26中超赛季绑定球员包 · 球员一览</h1>
+    <div class="sub">打开球员包将随机获得下列球员中的 1 名</div>
+  </div>
+  <input type="text" id="q" placeholder="搜索球队 / 球员">
+</header>
+<div class="layout">
+  <aside id="list"></aside>
+  <main>
+    <div class="card" id="head"></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto"><table id="tbl"></table></div>
+    </div>
+    <footer id="foot"></footer>
+  </main>
+</div>
+<script>
+const DATA = [{"name": "26中超赛季上海海港绑定球员包（8强）", "team": "上海海港", "strength": "8强", "desc": "包含26中超赛季上海海港球员，打开并随机获得一名8强球员", "players": [{"name": "莱昂纳多", "ovr": 120}, {"name": "马特乌斯·维塔尔", "ovr": 120}, {"name": "朱梅", "ovr": 115}, {"name": "颜骏凌", "ovr": 115}, {"name": "梅伦多", "ovr": 114}, {"name": "蒋光太", "ovr": 114}, {"name": "武磊", "ovr": 113}, {"name": "让-克洛德", "ovr": 112}, {"name": "魏震", "ovr": 112}, {"name": "刘祝润", "ovr": 111}, {"name": "加布里埃尔津霍", "ovr": 111}, {"name": "P. 安培姆", "ovr": 110}, {"name": "杨世元", "ovr": 110}, {"name": "米格尔·坎波斯", "ovr": 110}, {"name": "傅欢", "ovr": 109}, {"name": "张源", "ovr": 109}, {"name": "刘若钒", "ovr": 108}, {"name": "卢永涛", "ovr": 108}, {"name": "吾米提江·玉苏普", "ovr": 107}, {"name": "安永佳", "ovr": 107}, {"name": "岳鑫", "ovr": 107}, {"name": "李帅", "ovr": 107}, {"name": "李智良", "ovr": 107}, {"name": "王振澳", "ovr": 107}, {"name": "陈威", "ovr": 107}, {"name": "张琳芃", "ovr": 106}, {"name": "李新翔", "ovr": 106}, {"name": "杨希", "ovr": 106}, {"name": "王燊超", "ovr": 106}, {"name": "蒯纪闻", "ovr": 106}, {"name": "鲍士孟", "ovr": 106}]}, {"name": "26中超赛季上海申花绑定球员包（8强）", "team": "上海申花", "strength": "8强", "desc": "包含26中超赛季上海申花球员，打开并随机获得一名8强球员", "players": [{"name": "拉斐尔·拉唐", "ovr": 122}, {"name": "特谢拉", "ovr": 117}, {"name": "高天意", "ovr": 117}, {"name": "吴曦", "ovr": 116}, {"name": "威尔逊·马纳法", "ovr": 116}, {"name": "朱辰杰", "ovr": 115}, {"name": "蒋圣龙", "ovr": 114}, {"name": "陈晋一", "ovr": 114}, {"name": "M. 盖伊", "ovr": 113}, {"name": "谢鹏飞", "ovr": 112}, {"name": "路易斯·阿苏埃", "ovr": 112}, {"name": "绍洛·米内罗", "ovr": 111}, {"name": "汪海健", "ovr": 110}, {"name": "徐皓阳", "ovr": 109}, {"name": "李可", "ovr": 109}, {"name": "李松益", "ovr": 108}, {"name": "杨泽翔", "ovr": 108}, {"name": "杨皓宇", "ovr": 108}, {"name": "王世龙", "ovr": 108}, {"name": "吴启鹏", "ovr": 107}, {"name": "孙东阳", "ovr": 107}, {"name": "张斌", "ovr": 107}, {"name": "朱越", "ovr": 107}, {"name": "杨帅", "ovr": 107}, {"name": "薛庆浩", "ovr": 107}, {"name": "韩佳文", "ovr": 107}, {"name": "马镇", "ovr": 107}, {"name": "黄鸣", "ovr": 107}, {"name": "刘诚宇", "ovr": 106}, {"name": "金顺凯", "ovr": 106}]}, {"name": "26中超赛季云南玉昆绑定球员包（8强）", "team": "云南玉昆", "strength": "8强", "desc": "包含26中超赛季云南玉昆球员，打开并随机获得一名8强球员", "players": [{"name": "O. 马里图", "ovr": 121}, {"name": "A. 约尼察", "ovr": 120}, {"name": "A. 布尔卡", "ovr": 116}, {"name": "克莱伯", "ovr": 116}, {"name": "卡约", "ovr": 116}, {"name": "徐新", "ovr": 112}, {"name": "徐宏杰", "ovr": 111}, {"name": "段刘愚", "ovr": 111}, {"name": "邓涵文", "ovr": 111}, {"name": "石柯", "ovr": 110}, {"name": "侯永永", "ovr": 109}, {"name": "叶楚贵", "ovr": 108}, {"name": "孙学龙", "ovr": 108}, {"name": "张祥硕", "ovr": 108}, {"name": "俞建贤", "ovr": 107}, {"name": "崔棋", "ovr": 107}, {"name": "弋腾", "ovr": 107}, {"name": "王智峰", "ovr": 107}, {"name": "胡睿宝", "ovr": 107}, {"name": "费尔南多", "ovr": 107}, {"name": "赵宇豪", "ovr": 107}, {"name": "邱胜俊", "ovr": 107}, {"name": "鲍亚雄", "ovr": 107}, {"name": "B. 阿卜杜萨拉姆", "ovr": 106}, {"name": "张晨亮", "ovr": 106}, {"name": "杨梓豪", "ovr": 106}, {"name": "韩子龙", "ovr": 106}, {"name": "黄紫昌", "ovr": 106}]}, {"name": "26中超赛季北京国安绑定球员包（8强）", "team": "北京国安", "strength": "8强", "desc": "包含26中超赛季北京国安球员，打开并随机获得一名8强球员", "players": [{"name": "法比奥·阿布雷乌", "ovr": 121}, {"name": "C. 艾可罗", "ovr": 119}, {"name": "赛尔金鸟", "ovr": 119}, {"name": "J. 杜德兹阿克", "ovr": 116}, {"name": "A. 康特", "ovr": 115}, {"name": "张玉宁", "ovr": 115}, {"name": "达万", "ovr": 115}, {"name": "吉尔赫姆·拉莫斯", "ovr": 113}, {"name": "B. 恩科洛洛", "ovr": 112}, {"name": "侯森", "ovr": 112}, {"name": "张稀哲", "ovr": 112}, {"name": "林良铭", "ovr": 112}, {"name": "U. 斯帕吉克", "ovr": 110}, {"name": "池忠国", "ovr": 110}, {"name": "曹永竞", "ovr": 109}, {"name": "李磊", "ovr": 108}, {"name": "杨立瑜", "ovr": 108}, {"name": "柏杨", "ovr": 108}, {"name": "王刚", "ovr": 108}, {"name": "刘邵子洋", "ovr": 107}, {"name": "努尔艾力·阿巴斯", "ovr": 107}, {"name": "吴少聪", "ovr": 107}, {"name": "夏晓宇", "ovr": 107}, {"name": "张浩然", "ovr": 107}, {"name": "范双杰", "ovr": 107}, {"name": "韦嘉奥", "ovr": 107}, {"name": "韩佳奇", "ovr": 107}, {"name": "J. 邓", "ovr": 106}, {"name": "何宇鹏", "ovr": 106}, {"name": "刘俊泽", "ovr": 106}, {"name": "王禹", "ovr": 106}, {"name": "罗子翔", "ovr": 106}, {"name": "蒋子成", "ovr": 106}, {"name": "谢庭楠", "ovr": 106}, {"name": "贾非凡", "ovr": 106}, {"name": "阿不都海米提", "ovr": 106}, {"name": "陈康跃", "ovr": 106}]}, {"name": "26中超赛季大连英博绑定球员包（8强）", "team": "大连英博", "strength": "8强", "desc": "包含26中超赛季大连英博球员，打开并随机获得一名8强球员", "players": [{"name": "N. 斯坦丘", "ovr": 122}, {"name": "C. 马雷雷", "ovr": 118}, {"name": "F. 阿奇姆彭", "ovr": 117}, {"name": "I. 阿利米", "ovr": 116}, {"name": "M. 特拉奥雷", "ovr": 116}, {"name": "卢卓毅", "ovr": 111}, {"name": "廖锦涛", "ovr": 111}, {"name": "德尔加多", "ovr": 110}, {"name": "罗竞", "ovr": 110}, {"name": "冯博轩", "ovr": 109}, {"name": "宋岳", "ovr": 109}, {"name": "张华晨", "ovr": 108}, {"name": "张成瑞", "ovr": 108}, {"name": "毕津浩", "ovr": 108}, {"name": "温家宝", "ovr": 108}, {"name": "冯劲", "ovr": 107}, {"name": "刘伟国", "ovr": 107}, {"name": "吕鹏", "ovr": 107}, {"name": "彭顺杰", "ovr": 107}, {"name": "曹海清", "ovr": 107}, {"name": "朱鹏宇", "ovr": 107}, {"name": "毛伟杰", "ovr": 107}, {"name": "王晓峰", "ovr": 107}, {"name": "葛鹏", "ovr": 107}, {"name": "黄子豪", "ovr": 107}, {"name": "黄山", "ovr": 107}, {"name": "孙康博", "ovr": 106}, {"name": "杨明睿", "ovr": 106}, {"name": "肖力荣", "ovr": 106}]}, {"name": "26中超赛季天津津门虎绑定球员包（8强）", "team": "天津津门虎", "strength": "8强", "desc": "包含26中超赛季天津津门虎球员，打开并随机获得一名8强球员", "players": [{"name": "哈达斯", "ovr": 122}, {"name": "基莱斯", "ovr": 121}, {"name": "G. 谢蒂内", "ovr": 118}, {"name": "艾托尔·科尔多瓦", "ovr": 118}, {"name": "克里斯蒂安·萨尔瓦多", "ovr": 113}, {"name": "吴兴涵", "ovr": 109}, {"name": "巴顿", "ovr": 109}, {"name": "王政豪", "ovr": 108}, {"name": "郭皓", "ovr": 108}, {"name": "刘俊贤", "ovr": 107}, {"name": "孙铭谦", "ovr": 107}, {"name": "季胜攀", "ovr": 107}, {"name": "张皓然", "ovr": 107}, {"name": "李永佳", "ovr": 107}, {"name": "王秋明", "ovr": 107}, {"name": "石炎", "ovr": 107}, {"name": "谢维军", "ovr": 107}, {"name": "闫炳良", "ovr": 107}, {"name": "陈哲轩", "ovr": 107}, {"name": "黄嘉辉", "ovr": 107}, {"name": "齐玉熙", "ovr": 107}, {"name": "杨帆", "ovr": 106}, {"name": "王献钧", "ovr": 106}]}, {"name": "26中超赛季山东泰山绑定球员包（8强）", "team": "山东泰山", "strength": "8强", "desc": "包含26中超赛季山东泰山球员，打开并随机获得一名8强球员", "players": [{"name": "克雷桑", "ovr": 122}, {"name": "卡扎伊什维利", "ovr": 120}, {"name": "泽卡", "ovr": 119}, {"name": "佩德罗·阿尔瓦罗", "ovr": 118}, {"name": "吉列尔梅·马德鲁加", "ovr": 114}, {"name": "王大雷", "ovr": 114}, {"name": "李源一", "ovr": 113}, {"name": "刘洋", "ovr": 112}, {"name": "谢文能", "ovr": 112}, {"name": "黄政宇", "ovr": 112}, {"name": "高准翼", "ovr": 111}, {"name": "尹嘉熙", "ovr": 108}, {"name": "梅帅军", "ovr": 108}, {"name": "王彤", "ovr": 108}, {"name": "郑铮", "ovr": 108}, {"name": "陈蒲", "ovr": 108}, {"name": "买乌郎·米吉提", "ovr": 107}, {"name": "于金永", "ovr": 107}, {"name": "依木兰·买买提", "ovr": 107}, {"name": "刘奇伟", "ovr": 107}, {"name": "卢俊伟", "ovr": 107}, {"name": "史松宸", "ovr": 107}, {"name": "孙启航", "ovr": 107}, {"name": "彭啸", "ovr": 107}, {"name": "拉斐尔·默基斯", "ovr": 107}, {"name": "杨瑞琪", "ovr": 107}, {"name": "舍姆希丁·玉素甫江", "ovr": 107}, {"name": "陈泽仕", "ovr": 107}, {"name": "齐千程", "ovr": 107}, {"name": "彭奕翔", "ovr": 106}]}, {"name": "26中超赛季成都蓉城绑定球员包（8强）", "team": "成都蓉城", "strength": "8强", "desc": "包含26中超赛季成都蓉城球员，打开并随机获得一名8强球员", "players": [{"name": "威林顿·席尔瓦", "ovr": 121}, {"name": "罗慕洛", "ovr": 121}, {"name": "费利佩·席尔瓦", "ovr": 121}, {"name": "E. 索罗金", "ovr": 117}, {"name": "刘殿座", "ovr": 116}, {"name": "韦世豪", "ovr": 116}, {"name": "马特乌斯·茹萨", "ovr": 116}, {"name": "杨明洋", "ovr": 113}, {"name": "廖力生", "ovr": 111}, {"name": "买提江", "ovr": 110}, {"name": "冯卓毅", "ovr": 110}, {"name": "李扬", "ovr": 108}, {"name": "李漠雨", "ovr": 108}, {"name": "王子铭", "ovr": 108}, {"name": "A. 乔乔", "ovr": 107}, {"name": "冉伟枫", "ovr": 107}, {"name": "唐创", "ovr": 107}, {"name": "廖荣祥", "ovr": 107}, {"name": "彭浩宸", "ovr": 107}, {"name": "木塔力甫", "ovr": 107}, {"name": "甘超", "ovr": 107}, {"name": "蹇韬", "ovr": 107}, {"name": "陈仕涵", "ovr": 107}, {"name": "韩鹏飞", "ovr": 107}, {"name": "Q. 艾孜买提", "ovr": 106}, {"name": "拜合拉木", "ovr": 106}, {"name": "王东升", "ovr": 106}, {"name": "王子腾", "ovr": 106}, {"name": "胡荷韬", "ovr": 106}, {"name": "董岩峰", "ovr": 106}, {"name": "贺一然", "ovr": 106}]}, {"name": "26中超赛季武汉三镇绑定球员包（8强）", "team": "武汉三镇", "strength": "8强", "desc": "包含26中超赛季武汉三镇球员，打开并随机获得一名8强球员", "players": [{"name": "J. 卡迪斯", "ovr": 121}, {"name": "古斯塔沃·绍尔", "ovr": 118}, {"name": "阿德里亚诺·费尔米诺·", "ovr": 117}, {"name": "A. 劳蒂", "ovr": 115}, {"name": "K. 贝维斯", "ovr": 114}, {"name": "方镜淇", "ovr": 111}, {"name": "汪晋贤", "ovr": 111}, {"name": "廖承坚", "ovr": 109}, {"name": "张晓彬", "ovr": 109}, {"name": "李昂", "ovr": 109}, {"name": "贺惯", "ovr": 109}, {"name": "钟晋宝", "ovr": 108}, {"name": "余田乐", "ovr": 107}, {"name": "刘奕鸣", "ovr": 107}, {"name": "刘彬彬", "ovr": 107}, {"name": "夏子豪", "ovr": 107}, {"name": "明天", "ovr": 107}, {"name": "李申圆", "ovr": 107}, {"name": "王康", "ovr": 107}, {"name": "郑凯木", "ovr": 107}, {"name": "郑浩乾", "ovr": 107}, {"name": "郭嘉宇", "ovr": 107}, {"name": "闵紫曦", "ovr": 107}, {"name": "阿卜杜格尼·哈力特", "ovr": 107}, {"name": "陈哲超", "ovr": 107}, {"name": "姜利勋", "ovr": 106}, {"name": "徐浩峰", "ovr": 106}, {"name": "熊继政", "ovr": 106}, {"name": "王毅", "ovr": 106}, {"name": "龙威", "ovr": 106}]}, {"name": "26中超赛季河南足球绑定球员包（8强）", "team": "河南足球", "strength": "8强", "desc": "包含26中超赛季河南足球球员，打开并随机获得一名8强球员", "players": [{"name": "布鲁诺·纳扎里奥", "ovr": 121}, {"name": "古斯塔沃", "ovr": 120}, {"name": "马拉尼昂", "ovr": 117}, {"name": "伊阿古·迈达纳", "ovr": 116}, {"name": "卢卡斯·马亚", "ovr": 115}, {"name": "王上源", "ovr": 114}, {"name": "杨阔", "ovr": 111}, {"name": "王国明", "ovr": 110}, {"name": "郑达伦", "ovr": 110}, {"name": "E. 奥斯曼", "ovr": 109}, {"name": "何超", "ovr": 109}, {"name": "乃比江·莫合买提", "ovr": 108}, {"name": "阿布勒汉", "ovr": 108}, {"name": "黄锐烽", "ovr": 108}, {"name": "O. 格比", "ovr": 107}, {"name": "史成龙", "ovr": 107}, {"name": "尹聪耀", "ovr": 107}, {"name": "徐嘉敏", "ovr": 107}, {"name": "杨意林", "ovr": 107}, {"name": "王金帅", "ovr": 107}, {"name": "A. 阿不都拉木", "ovr": 106}, {"name": "刘家辉", "ovr": 106}, {"name": "刘易鑫", "ovr": 106}, {"name": "叶力江·什那尔", "ovr": 106}, {"name": "钟义浩", "ovr": 106}]}, {"name": "26中超赛季浙江俱乐部绑定球员包（8强）", "team": "浙江俱乐部", "strength": "8强", "desc": "包含26中超赛季浙江俱乐部球员，打开并随机获得一名8强球员", "players": [{"name": "A. 里奥努·米特里", "ovr": 122}, {"name": "朴鎭燮", "ovr": 121}, {"name": "M. 托利奇", "ovr": 118}, {"name": "卢卡斯", "ovr": 116}, {"name": "F. 多斯桑托斯", "ovr": 114}, {"name": "S. 瓜里拉帕", "ovr": 114}, {"name": "王钰栋", "ovr": 110}, {"name": "程进", "ovr": 110}, {"name": "赵博", "ovr": 110}, {"name": "钱杰给", "ovr": 109}, {"name": "吴伟", "ovr": 108}, {"name": "宁方泽", "ovr": 108}, {"name": "张佳祺", "ovr": 108}, {"name": "麻皓齐", "ovr": 108}, {"name": "刘浩帆", "ovr": 107}, {"name": "包盛鑫", "ovr": 107}, {"name": "孙国文", "ovr": 107}, {"name": "张爱辉", "ovr": 107}, {"name": "徐俊驰", "ovr": 107}, {"name": "方昊", "ovr": 107}, {"name": "王鹏博", "ovr": 107}, {"name": "童磊", "ovr": 107}, {"name": "董春雨", "ovr": 107}, {"name": "赵培丞", "ovr": 107}, {"name": "钱远帆", "ovr": 107}, {"name": "霍深坪", "ovr": 107}, {"name": "高迪", "ovr": 107}, {"name": "汪士钦", "ovr": 106}, {"name": "王瑒", "ovr": 106}, {"name": "陶强龙", "ovr": 106}]}, {"name": "26中超赛季深圳新鹏城绑定球员包（8强）", "team": "深圳新鹏城", "strength": "8强", "desc": "包含26中超赛季深圳新鹏城球员，打开并随机获得一名8强球员", "players": [{"name": "F. 本科维奇", "ovr": 119}, {"name": "加布里埃尔·沙维尔", "ovr": 118}, {"name": "周定洋", "ovr": 117}, {"name": "维斯雷", "ovr": 117}, {"name": "E. 卡尔泽夫", "ovr": 116}, {"name": "奥乌苏", "ovr": 114}, {"name": "阿代米", "ovr": 113}, {"name": "戴伟浚", "ovr": 111}, {"name": "姜至鹏", "ovr": 109}, {"name": "张宇峰", "ovr": 109}, {"name": "季家葆", "ovr": 108}, {"name": "于梦辉", "ovr": 107}, {"name": "夏达龙", "ovr": 107}, {"name": "姚俊毅", "ovr": 107}, {"name": "姚均晟", "ovr": 107}, {"name": "张皓楠", "ovr": 107}, {"name": "彭鹏", "ovr": 107}, {"name": "李宁", "ovr": 107}, {"name": "李龙", "ovr": 107}, {"name": "沈欢明", "ovr": 107}, {"name": "王宇恒", "ovr": 107}, {"name": "赵剑非", "ovr": 107}, {"name": "魏黾哲", "ovr": 107}, {"name": "于睿", "ovr": 106}, {"name": "唐淼", "ovr": 106}, {"name": "杨一鸣", "ovr": 106}, {"name": "玄智健", "ovr": 106}, {"name": "田逸凡", "ovr": 106}]}, {"name": "26中超赛季辽宁铁人绑定球员包（8强）", "team": "辽宁铁人", "strength": "8强", "desc": "包含26中超赛季辽宁铁人球员，打开并随机获得一名8强球员", "players": [{"name": "杰菲尼奥", "ovr": 118}, {"name": "邦本宜裕", "ovr": 118}, {"name": "G. 姆本扎", "ovr": 115}, {"name": "费利佩", "ovr": 113}, {"name": "李提香", "ovr": 112}, {"name": "严鼎皓", "ovr": 111}, {"name": "臧一锋", "ovr": 109}, {"name": "A. 夸梅", "ovr": 108}, {"name": "田依浓", "ovr": 108}, {"name": "许东", "ovr": 108}, {"name": "陈彬彬", "ovr": 108}, {"name": "刘国博", "ovr": 107}, {"name": "庞圣涵", "ovr": 107}, {"name": "张岩", "ovr": 107}, {"name": "栗鹏", "ovr": 107}, {"name": "潘希明", "ovr": 107}, {"name": "王天爱", "ovr": 107}, {"name": "田德澳", "ovr": 107}, {"name": "解锦添", "ovr": 107}, {"name": "韩镕泽", "ovr": 107}, {"name": "D. 毛拉尼亚兹", "ovr": 106}, {"name": "元敏诚", "ovr": 106}, {"name": "吴明宇", "ovr": 106}, {"name": "张洪福", "ovr": 106}, {"name": "李世奇", "ovr": 106}, {"name": "李浩然", "ovr": 106}, {"name": "田玉达", "ovr": 106}, {"name": "郑嘉诚", "ovr": 106}, {"name": "高嘉润", "ovr": 106}]}, {"name": "26中超赛季重庆铜梁龙绑定球员包（8强）", "team": "重庆铜梁龙", "strength": "8强", "desc": "包含26中超赛季重庆铜梁龙球员，打开并随机获得一名8强球员", "players": [{"name": "恩加德乌", "ovr": 118}, {"name": "N. 迪马塔", "ovr": 116}, {"name": "卢卡斯·席尔瓦", "ovr": 115}, {"name": "阿马杜", "ovr": 115}, {"name": "A. 琴帕努", "ovr": 114}, {"name": "向余望", "ovr": 108}, {"name": "白玉涛", "ovr": 108}, {"name": "刘佳乐", "ovr": 107}, {"name": "刘铭仕", "ovr": 107}, {"name": "叶尔杰提", "ovr": 107}, {"name": "吴宇熙", "ovr": 107}, {"name": "吴梓桐", "ovr": 107}, {"name": "吴永强", "ovr": 107}, {"name": "姚浩洋", "ovr": 107}, {"name": "岳瑞杰", "ovr": 107}, {"name": "张英凯", "ovr": 107}, {"name": "李镇全", "ovr": 107}, {"name": "杜月正", "ovr": 107}, {"name": "梁伟鹏", "ovr": 107}, {"name": "阮齐龙", "ovr": 107}, {"name": "陈纯新", "ovr": 107}, {"name": "和晓强", "ovr": 106}, {"name": "张志雄", "ovr": 106}, {"name": "晋鹏翔", "ovr": 106}, {"name": "韦所为", "ovr": 106}]}, {"name": "26中超赛季青岛海牛绑定球员包（8强）", "team": "青岛海牛", "strength": "8强", "desc": "包含26中超赛季青岛海牛球员，打开并随机获得一名8强球员", "players": [{"name": "C. 斯特朗伯格", "ovr": 115}, {"name": "Y. 叶波哈", "ovr": 114}, {"name": "M. 埃德玛", "ovr": 112}, {"name": "N. 安杰尔科维奇", "ovr": 111}, {"name": "牟鹏飞", "ovr": 110}, {"name": "宋龙", "ovr": 108}, {"name": "林创益", "ovr": 108}, {"name": "王峤", "ovr": 108}, {"name": "罗森文", "ovr": 108}, {"name": "颜卓彬", "ovr": 108}, {"name": "L. 图费格季奇", "ovr": 107}, {"name": "M. 塔什", "ovr": 107}, {"name": "刘君", "ovr": 107}, {"name": "刘新宇", "ovr": 107}, {"name": "孙正傲", "ovr": 107}, {"name": "杨聪", "ovr": 107}, {"name": "郑传辉", "ovr": 107}, {"name": "龚瑞聪", "ovr": 107}, {"name": "刘佳燊", "ovr": 106}, {"name": "刘军帅", "ovr": 106}, {"name": "刘国宝", "ovr": 106}, {"name": "宋文杰", "ovr": 106}, {"name": "李思荣", "ovr": 106}, {"name": "李海龙", "ovr": 106}, {"name": "李苏达", "ovr": 106}, {"name": "车世伟", "ovr": 106}, {"name": "邝兆雷", "ovr": 106}, {"name": "金永浩", "ovr": 106}, {"name": "金洋洋", "ovr": 106}, {"name": "魏子贤", "ovr": 106}]}, {"name": "26中超赛季青岛西海岸绑定球员包（8强）", "team": "青岛西海岸", "strength": "8强", "desc": "包含26中超赛季青岛西海岸球员，打开并随机获得一名8强球员", "players": [{"name": "戴维森", "ovr": 120}, {"name": "A. 雅库布", "ovr": 119}, {"name": "S. 梅米塞维奇", "ovr": 119}, {"name": "内尔森·达卢斯", "ovr": 117}, {"name": "布鲁诺·维亚纳", "ovr": 116}, {"name": "李昊", "ovr": 111}, {"name": "丁海峰", "ovr": 110}, {"name": "张修维", "ovr": 110}, {"name": "赵宏略", "ovr": 110}, {"name": "彭欣力", "ovr": 109}, {"name": "董宇", "ovr": 109}, {"name": "张呈栋", "ovr": 108}, {"name": "B. 布劳恩施泰因", "ovr": 107}, {"name": "东航", "ovr": 107}, {"name": "何龙海", "ovr": 107}, {"name": "刘世博", "ovr": 107}, {"name": "孙捷", "ovr": 107}, {"name": "孟敬朝", "ovr": 107}, {"name": "张伯煊", "ovr": 107}, {"name": "杨展鹏", "ovr": 107}, {"name": "王鹏", "ovr": 107}, {"name": "谢亚历山大", "ovr": 107}, {"name": "贾伟伟", "ovr": 107}, {"name": "金世明", "ovr": 107}, {"name": "齐炳宇", "ovr": 107}, {"name": "E. 洛曼", "ovr": 106}, {"name": "南松", "ovr": 106}, {"name": "王庚睿", "ovr": 106}, {"name": "艾菲尔丁·艾斯卡尔", "ovr": 106}]}];
+const listEl = document.getElementById('list');
+const headEl = document.getElementById('head');
+const tblEl = document.getElementById('tbl');
+const footEl = document.getElementById('foot');
+let current = 0;
+
+function ovrColor(ovr){
+  if (ovr >= 136) return 'linear-gradient(135deg,#7b1fa2,#ba68c8)';
+  if (ovr >= 133) return 'linear-gradient(135deg,#c62828,#ef5350)';
+  if (ovr >= 130) return 'linear-gradient(135deg,#f5a623,#f7c46c)';
+  if (ovr >= 125) return 'linear-gradient(135deg,#2e7d32,#66bb6a)';
+  if (ovr >= 122) return 'linear-gradient(135deg,#1565c0,#42a5f5)';
+  return 'linear-gradient(135deg,#546e7a,#90a4ae)';
+}
+
+function renderList(filter){
+  listEl.innerHTML = '';
+  const groups = {};
+  DATA.forEach((pk, i) => { (groups[pk.strength] = groups[pk.strength] || []).push([pk, i]); });
+  Object.keys(groups).forEach(g => {
+    const t = document.createElement('div');
+    t.className = 'grp-title';
+    t.textContent = g + '球员包（' + groups[g].length + '）';
+    listEl.appendChild(t);
+    groups[g].forEach(([pk, i]) => {
+      if (filter && !(pk.team.includes(filter) || pk.name.includes(filter))) return;
+      const d = document.createElement('div');
+      d.className = 'item' + (i === current ? ' active' : '');
+      d.innerHTML = '<span>' + pk.team + '</span><span class="tag">' + pk.strength + '</span>';
+      d.onclick = () => { current = i; render(); };
+      listEl.appendChild(d);
+    });
+  });
+  const act = listEl.querySelector('.item.active');
+  if (act && window.innerWidth <= 820) {
+    act.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
+}
+
+function render(){
+  const pk = DATA[current];
+  const filter = document.getElementById('q').value.trim();
+  renderList(filter);
+  const ovrs = pk.players.map(x => x.ovr);
+  headEl.innerHTML =
+    '<div class="pack-title">' + pk.team + ' · ' + pk.strength + '绑定球员包</div>' +
+    '<div class="pack-desc">' + pk.desc + '</div>' +
+    '<div class="meta">' +
+      '<div>球员数<b>' + pk.players.length + '</b></div>' +
+      '<div>最高8强OVR<b>' + (Math.max.apply(null, ovrs) + 15) + '</b></div>' +
+      '<div>最低8强OVR<b>' + (Math.min.apply(null, ovrs) + 15) + '</b></div>' +
+    '</div>';
+
+  let rows = pk.players.map(x => Object.assign({}, x));
+  if (filter) {
+    rows = DATA.flatMap(p => p.players.filter(x => x.name.includes(filter))
+      .map(x => Object.assign({}, x, { _pk: p.team + ' ' + p.strength })));
+  }
+  let html = '<thead><tr><th class="num">#</th><th>球员</th><th class="num">8强OVR</th>' +
+             (filter ? '<th>所属球员包</th>' : '') + '</tr></thead><tbody>';
+  rows.forEach((x, i) => {
+    html += '<tr>' +
+      '<td class="num rank">' + (i + 1) + '</td>' +
+      '<td><b>' + x.name + '</b></td>' +
+      '<td class="num"><span class="ovr" style="background:' + ovrColor(x.ovr + 15) + '">' + (x.ovr + 15) + '</span></td>' +
+      (filter ? '<td>' + x._pk + '</td>' : '') +
+    '</tr>';
+  });
+  tblEl.innerHTML = html + '</tbody>';
+  footEl.textContent = filter
+    ? '搜索“' + filter + '”命中 ' + rows.length + ' 条球员记录（全部球员包）'
+    : '共 ' + pk.players.length + ' 名球员 · OVR 为 8强能力值';
+}
+
+document.getElementById('q').addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
